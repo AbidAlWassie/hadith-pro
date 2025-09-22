@@ -24,6 +24,17 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
+// Declare global puter object for TypeScript
+declare global {
+  interface Window {
+    puter: {
+      ai: {
+        txt2speech: (text: string, options?: any) => Promise<HTMLAudioElement>;
+      };
+    };
+  }
+}
+
 interface HadithCardProps {
   hadith: Hadith;
   showExplanation?: boolean;
@@ -98,6 +109,7 @@ export function HadithCard({
       currentAudio.currentTime = 0;
       setIsPlaying(false);
       setCurrentAudio(null);
+      console.log("[v0] Stopped current audio");
       return;
     }
 
@@ -105,31 +117,21 @@ export function HadithCard({
 
     try {
       console.log(
-        "[v0] Requesting TTS for Arabic text:",
+        "[v0] Using Puter.js TTS for Arabic text:",
         hadith.textArabic.substring(0, 50) + "..."
       );
 
-      const response = await fetch("/api/text-to-speech", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: hadith.textArabic,
-          voice: "ar-SA-ZariyahNeural",
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!window.puter) {
+        throw new Error("Puter.js not loaded");
       }
 
-      console.log("[v0] TTS API response received");
-      const audioBlob = await response.blob();
-      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = await window.puter.ai.txt2speech(hadith.textArabic, {
+        voice: "Joanna",
+        engine: "neural",
+        language: "ar-SA",
+      });
 
-      const audio = new Audio();
-      audio.src = audioUrl;
+      console.log("[v0] Puter.js TTS audio generated successfully");
 
       audio.onplay = () => {
         console.log("[v0] Audio started playing");
@@ -140,10 +142,9 @@ export function HadithCard({
         console.log("[v0] Audio finished playing");
         setIsPlaying(false);
         setCurrentAudio(null);
-        URL.revokeObjectURL(audioUrl);
       };
 
-      audio.onerror = (e) => {
+      audio.onerror = (e: any) => {
         console.error("[v0] Audio playback error:", e);
         toast.error("Failed to play audio");
         setIsPlaying(false);
@@ -151,10 +152,11 @@ export function HadithCard({
       };
 
       setCurrentAudio(audio);
+      console.log("[v0] Starting audio playback");
       await audio.play();
       toast.success("Playing Arabic recitation");
     } catch (error) {
-      console.error("[v0] TTS Error:", error);
+      console.error("[v0] Puter.js TTS Error:", error);
       toast.error("Failed to generate audio. Please try again.");
     } finally {
       setIsLoadingAudio(false);

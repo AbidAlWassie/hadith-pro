@@ -28,6 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script src="https://js.puter.com/v2/"></script>
+      </head>
       <body
         className={`font-sans antialiased ${GeistSans.variable} ${GeistMono.variable} ${notoSansArabic.variable}`}
       >
