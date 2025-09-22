@@ -126,7 +126,7 @@ export function HadithCard({
       }
 
       const audio = await window.puter.ai.txt2speech(hadith.textArabic, {
-        voice: "Joanna",
+        voice: "Zayd",
         engine: "neural",
         language: "ar-SA",
       });
