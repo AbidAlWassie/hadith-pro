@@ -1,105 +1,263 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { BookOpen, Star, Share, Bookmark, ExternalLink, Copy } from "lucide-react"
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import type { Hadith } from "@/lib/hadith-api";
+import {
+  Bookmark,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  ExternalLink,
+  Share,
+  Star,
+  Volume2,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface HadithCardProps {
-  hadith: {
-    id: string
-    arabicText: string
-    englishText: string
-    collection: string
-    book: string
-    hadithNumber: string
-    narrator: string
-    grade: string
-    gradeColor?: "green" | "yellow" | "red" | "gray"
-    explanation?: string
-  }
-  showExplanation?: boolean
-  compact?: boolean
+  hadith: Hadith;
+  showExplanation?: boolean;
+  compact?: boolean;
 }
 
-export function HadithCard({ hadith, showExplanation = false, compact = false }: HadithCardProps) {
+export function HadithCard({
+  hadith,
+  showExplanation = false,
+  compact = false,
+}: HadithCardProps) {
+  const [isExplanationOpen, setIsExplanationOpen] = useState(showExplanation);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isStarred, setIsStarred] = useState(false);
+
   const getGradeColor = (grade: string) => {
     switch (grade.toLowerCase()) {
       case "sahih":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+        return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800";
       case "hasan":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800";
       case "da'if":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+        return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800";
+      case "mawdu'":
+        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800";
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+        return "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-950 dark:text-gray-300 dark:border-gray-800";
     }
-  }
+  };
+
+  const handleCopy = async () => {
+    const textToCopy = `${hadith.textArabic}\n\n${hadith.text}\n\nNarrator: ${hadith.narrator}\nReference: ${hadith.reference}`;
+    await navigator.clipboard.writeText(textToCopy);
+    toast.success("Hadith copied to clipboard");
+  };
+
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+    toast.success(
+      isBookmarked ? "Removed from bookmarks" : "Added to bookmarks"
+    );
+  };
+
+  const handleStar = () => {
+    setIsStarred(!isStarred);
+    toast.success(isStarred ? "Removed from favorites" : "Added to favorites");
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      await navigator.share({
+        title: `Hadith from ${hadith.collection}`,
+        text: hadith.text,
+        url: window.location.href,
+      });
+    } else {
+      handleCopy();
+    }
+  };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className={compact ? "pb-2" : "pb-3"}>
+    <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-br from-background to-background/50">
+      <CardHeader className={compact ? "pb-3" : "pb-4"}>
         <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm">
-            <BookOpen className="h-4 w-4 text-secondary" />
-            <span className="font-medium text-foreground">{hadith.collection}</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <div className="flex items-center gap-2 bg-muted/50 px-3 py-1 rounded-full">
+              <BookOpen className="h-4 w-4 text-primary" />
+              <span className="font-semibold text-foreground">
+                {hadith.collection}
+              </span>
+            </div>
             <span className="text-muted-foreground">•</span>
-            <span className="text-muted-foreground">{hadith.book}</span>
+            <span className="text-muted-foreground font-medium">
+              {hadith.book}
+            </span>
             <span className="text-muted-foreground">•</span>
-            <span className="text-muted-foreground">Hadith {hadith.hadithNumber}</span>
+            <span className="text-muted-foreground">
+              #{hadith.hadithNumber}
+            </span>
           </div>
-          <Badge className={getGradeColor(hadith.grade)}>{hadith.grade}</Badge>
+          <Badge
+            className={`${getGradeColor(
+              hadith.grade
+            )} border font-semibold px-3 py-1`}
+          >
+            {hadith.grade}
+          </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {/* Arabic Text */}
-        <div className={`arabic-text bg-muted/30 rounded-lg border ${compact ? "p-3" : "p-4"}`}>
-          <p className={`leading-relaxed ${compact ? "text-base" : "text-lg"}`}>{hadith.arabicText}</p>
+        <div
+          className={`bg-gradient-to-r from-muted/30 to-muted/10 rounded-xl border-2 border-muted/50 ${
+            compact ? "p-4" : "p-6"
+          }`}
+        >
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-muted-foreground">
+              Arabic Text
+            </span>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Volume2 className="h-4 w-4" />
+            </Button>
+          </div>
+          <p
+            className={`font-arabic leading-loose text-right ${
+              compact ? "text-lg" : "text-xl"
+            } text-foreground`}
+          >
+            {hadith.textArabic}
+          </p>
         </div>
 
         {/* English Translation */}
-        <div className="english-text">
-          <p className={`text-foreground leading-relaxed ${compact ? "text-sm" : ""}`}>{hadith.englishText}</p>
+        <div className="space-y-3">
+          <span className="text-sm font-medium text-muted-foreground">
+            English Translation
+          </span>
+          <p
+            className={`text-foreground leading-relaxed ${
+              compact ? "text-base" : "text-lg"
+            } font-medium`}
+          >
+            {hadith.text}
+          </p>
         </div>
 
-        {/* Explanation (if provided and requested) */}
-        {showExplanation && hadith.explanation && (
-          <div className="bg-secondary/10 p-4 rounded-lg border border-secondary/20">
-            <h4 className="font-medium text-foreground mb-2 flex items-center gap-2">
-              <BookOpen className="h-4 w-4 text-secondary" />
-              Explanation:
-            </h4>
-            <p className="text-sm text-foreground leading-relaxed">{hadith.explanation}</p>
-          </div>
+        {/* Explanation Section */}
+        {hadith.explanation && (
+          <Collapsible
+            open={isExplanationOpen}
+            onOpenChange={setIsExplanationOpen}
+          >
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-between h-12 bg-transparent"
+              >
+                <span className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Scholarly Explanation
+                </span>
+                {isExplanationOpen ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4">
+              <div className="bg-primary/5 border-l-4 border-primary p-4 rounded-r-lg">
+                <p className="text-foreground leading-relaxed">
+                  {hadith.explanation}
+                </p>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
 
-        {/* Narrator and Actions */}
-        <div className="flex items-center justify-between pt-2 border-t">
+        {/* Narrator and Reference */}
+        <div className="bg-muted/20 rounded-lg p-4 space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">Narrator:</span>
-            <span className="text-sm font-medium text-foreground">{hadith.narrator}</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              Narrator:
+            </span>
+            <span className="text-sm font-semibold text-foreground">
+              {hadith.narrator}
+            </span>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              Reference:
+            </span>
+            <span className="text-sm font-mono text-foreground bg-background px-2 py-1 rounded border">
+              {hadith.reference}
+            </span>
+          </div>
+        </div>
 
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between pt-4 border-t-2">
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm">
-              <Star className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleStar}
+              className={`hover:bg-yellow-100 hover:text-yellow-700 ${
+                isStarred ? "bg-yellow-100 text-yellow-700" : ""
+              }`}
+            >
+              <Star className={`h-4 w-4 ${isStarred ? "fill-current" : ""}`} />
             </Button>
-            <Button variant="ghost" size="sm">
-              <Bookmark className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleBookmark}
+              className={`hover:bg-blue-100 hover:text-blue-700 ${
+                isBookmarked ? "bg-blue-100 text-blue-700" : ""
+              }`}
+            >
+              <Bookmark
+                className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`}
+              />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopy}
+              className="hover:bg-green-100 hover:text-green-700"
+            >
               <Copy className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleShare}
+              className="hover:bg-purple-100 hover:text-purple-700"
+            >
               <Share className="h-4 w-4" />
             </Button>
-            {!compact && (
-              <Button variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            )}
           </div>
+
+          {!compact && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="font-medium bg-transparent"
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              View Details
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
