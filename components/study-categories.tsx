@@ -1,7 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { BookOpen, Users, Heart, Scale, Zap, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight, BookOpen, Heart, Scale, Users, Zap } from "lucide-react";
 
 const categories = [
   {
@@ -26,7 +26,8 @@ const categories = [
     icon: Users,
     description: "Akhlaq, manners, and moral conduct",
     count: 1834,
-    color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    color:
+      "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
   },
   {
     id: "law",
@@ -34,7 +35,8 @@ const categories = [
     icon: Scale,
     description: "Fiqh, legal rulings, and jurisprudence",
     count: 1923,
-    color: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+    color:
+      "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
   },
   {
     id: "prophetic",
@@ -44,7 +46,7 @@ const categories = [
     count: 2847,
     color: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
   },
-]
+];
 
 const recentStudies = [
   {
@@ -65,19 +67,24 @@ const recentStudies = [
     date: "2 weeks ago",
     hadithCount: 67,
   },
-]
+];
 
 export function StudyCategories() {
   return (
     <div className="space-y-6">
       {/* Categories */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-4">Study Categories</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Study Categories
+        </h2>
         <div className="space-y-3">
           {categories.map((category) => {
-            const IconComponent = category.icon
+            const IconComponent = category.icon;
             return (
-              <Card key={category.id} className="hover:shadow-md transition-shadow cursor-pointer">
+              <Card
+                key={category.id}
+                className="hover:shadow-md transition-shadow cursor-pointer"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <div className="p-2 rounded-lg bg-secondary/10">
@@ -85,17 +92,21 @@ export function StudyCategories() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-medium text-foreground text-sm">{category.title}</h3>
+                        <h3 className="font-medium text-foreground text-sm">
+                          {category.title}
+                        </h3>
                         <Badge variant="secondary" className={category.color}>
                           {category.count}
                         </Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{category.description}</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {category.description}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
         <Button variant="outline" className="w-full mt-4 bg-transparent">
@@ -106,13 +117,20 @@ export function StudyCategories() {
 
       {/* Recent Studies */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-4">Recent Studies</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Recent Studies
+        </h2>
         <div className="space-y-3">
           {recentStudies.map((study, index) => (
-            <Card key={index} className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card
+              key={index}
+              className="hover:shadow-md transition-shadow cursor-pointer"
+            >
               <CardContent className="p-4">
                 <div className="space-y-2">
-                  <h3 className="font-medium text-foreground text-sm leading-tight">{study.title}</h3>
+                  <h3 className="font-medium text-foreground text-sm leading-tight">
+                    {study.title}
+                  </h3>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>by {study.author}</span>
                     <span>{study.date}</span>
@@ -133,5 +151,5 @@ export function StudyCategories() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

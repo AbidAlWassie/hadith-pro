@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { BookOpen, User, Calendar, Star, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { ArrowRight, BookOpen, Calendar, Star, User } from "lucide-react";
 
 const collections = [
   {
@@ -27,7 +27,8 @@ const collections = [
     authorDates: "204-261 AH",
     totalHadith: 5362,
     authenticityRating: 99,
-    description: "Second most authentic collection, known for systematic organization",
+    description:
+      "Second most authentic collection, known for systematic organization",
     books: 56,
     compilationPeriod: "15 years",
     status: "Complete",
@@ -89,11 +90,11 @@ const collections = [
     status: "Complete",
     featured: false,
   },
-]
+];
 
 export function CollectionsOverview() {
-  const featuredCollections = collections.filter((c) => c.featured)
-  const otherCollections = collections.filter((c) => !c.featured)
+  const featuredCollections = collections.filter((c) => c.featured);
+  const otherCollections = collections.filter((c) => !c.featured);
 
   return (
     <div className="space-y-8">
@@ -101,7 +102,9 @@ export function CollectionsOverview() {
       <div>
         <div className="flex items-center gap-2 mb-6">
           <Star className="h-5 w-5 text-secondary" />
-          <h2 className="text-2xl font-bold text-foreground">Featured Collections</h2>
+          <h2 className="text-2xl font-bold text-foreground">
+            Featured Collections
+          </h2>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-6">
@@ -110,8 +113,12 @@ export function CollectionsOverview() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-lg text-foreground">{collection.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{collection.fullName}</p>
+                    <CardTitle className="text-lg text-foreground">
+                      {collection.name}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {collection.fullName}
+                    </p>
                   </div>
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                     {collection.status}
@@ -120,37 +127,54 @@ export function CollectionsOverview() {
               </CardHeader>
 
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground leading-relaxed">{collection.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {collection.description}
+                </p>
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <User className="h-4 w-4 text-secondary" />
-                      <span className="text-foreground">{collection.author}</span>
+                      <span className="text-foreground">
+                        {collection.author}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-secondary" />
-                      <span className="text-muted-foreground">{collection.authorDates}</span>
+                      <span className="text-muted-foreground">
+                        {collection.authorDates}
+                      </span>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-4 w-4 text-secondary" />
-                      <span className="text-muted-foreground">{collection.totalHadith} hadith</span>
+                      <span className="text-muted-foreground">
+                        {collection.totalHadith} hadith
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-4 w-4 text-secondary" />
-                      <span className="text-muted-foreground">{collection.books} books</span>
+                      <span className="text-muted-foreground">
+                        {collection.books} books
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-foreground">Authenticity Rating</span>
-                    <span className="text-sm font-medium text-secondary">{collection.authenticityRating}%</span>
+                    <span className="text-sm text-foreground">
+                      Authenticity Rating
+                    </span>
+                    <span className="text-sm font-medium text-secondary">
+                      {collection.authenticityRating}%
+                    </span>
                   </div>
-                  <Progress value={collection.authenticityRating} className="h-2" />
+                  <Progress
+                    value={collection.authenticityRating}
+                    className="h-2"
+                  />
                 </div>
 
                 <Button className="w-full bg-secondary hover:bg-secondary/90">
@@ -165,16 +189,25 @@ export function CollectionsOverview() {
 
       {/* Other Collections */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Other Major Collections</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">
+          Other Major Collections
+        </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {otherCollections.map((collection) => (
-            <Card key={collection.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={collection.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <CardTitle className="text-base text-foreground">{collection.name}</CardTitle>
-                    <p className="text-xs text-muted-foreground">{collection.author}</p>
+                    <CardTitle className="text-base text-foreground">
+                      {collection.name}
+                    </CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      {collection.author}
+                    </p>
                   </div>
                   <Badge variant="outline" className="text-xs">
                     {collection.authenticityRating}%
@@ -183,14 +216,20 @@ export function CollectionsOverview() {
               </CardHeader>
 
               <CardContent className="space-y-3">
-                <p className="text-xs text-muted-foreground leading-relaxed">{collection.description}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {collection.description}
+                </p>
 
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>{collection.totalHadith} hadith</span>
                   <span>{collection.books} books</span>
                 </div>
 
-                <Button variant="outline" size="sm" className="w-full bg-transparent">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full bg-transparent"
+                >
                   View Details
                 </Button>
               </CardContent>
@@ -199,5 +238,5 @@ export function CollectionsOverview() {
         </div>
       </div>
     </div>
-  )
+  );
 }

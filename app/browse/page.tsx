@@ -1,3 +1,25 @@
-export default function browse() {
-  return <div>browse</div>;
+import { BrowseInterface } from "@/components/browse-interface";
+import { Header } from "@/components/header";
+
+export default function BrowsePage() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20">
+      <Header />
+      <main className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent text-balance">
+              Browse Hadith Collection
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty leading-relaxed">
+              Explore thousands of authenticated hadith organized by topics,
+              collections, and themes
+            </p>
+          </div>
+
+          <BrowseInterface />
+        </div>
+      </main>
+    </div>
+  );
 }

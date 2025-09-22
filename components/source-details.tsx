@@ -1,11 +1,18 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { BookOpen, User, Calendar, MapPin, ExternalLink, Info } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import {
+  BookOpen,
+  Calendar,
+  ExternalLink,
+  Info,
+  MapPin,
+  User,
+} from "lucide-react";
 
 interface SourceDetailsProps {
-  hadithId: string
+  hadithId: string;
 }
 
 const sourceData = {
@@ -26,7 +33,8 @@ const sourceData = {
     arabicName: "كتاب بدء الوحي",
     number: 1,
     hadithCount: 7,
-    description: "This book discusses the beginning of divine revelation to Prophet Muhammad (ﷺ).",
+    description:
+      "This book discusses the beginning of divine revelation to Prophet Muhammad (ﷺ).",
   },
   hadith: {
     number: 1,
@@ -38,7 +46,8 @@ const sourceData = {
       title: "Amir al-Mu'minin (Commander of the Faithful)",
       dates: "584-644 CE",
       relationship: "Second Caliph of Islam",
-      reliability: "Extremely reliable narrator, known for his precision and memory",
+      reliability:
+        "Extremely reliable narrator, known for his precision and memory",
     },
   },
   chainOfNarration: [
@@ -73,7 +82,7 @@ const sourceData = {
       dates: "194-256 AH",
     },
   ],
-}
+};
 
 export function SourceDetails({ hadithId }: SourceDetailsProps) {
   return (
@@ -89,34 +98,52 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-semibold text-foreground mb-2">{sourceData.collection.name}</h3>
-              <p className="text-sm text-muted-foreground mb-2">{sourceData.collection.fullName}</p>
+              <h3 className="font-semibold text-foreground mb-2">
+                {sourceData.collection.name}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-2">
+                {sourceData.collection.fullName}
+              </p>
               <div className="space-y-1 text-sm">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-secondary" />
-                  <span className="text-foreground">{sourceData.collection.author}</span>
+                  <span className="text-foreground">
+                    {sourceData.collection.author}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-secondary" />
-                  <span className="text-muted-foreground">{sourceData.collection.authorDates}</span>
+                  <span className="text-muted-foreground">
+                    {sourceData.collection.authorDates}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Info className="h-4 w-4 text-secondary" />
-                  <span className="text-muted-foreground">{sourceData.collection.totalHadith} total hadith</span>
+                  <span className="text-muted-foreground">
+                    {sourceData.collection.totalHadith} total hadith
+                  </span>
                 </div>
               </div>
             </div>
             <div>
-              <h4 className="font-medium text-foreground mb-2">About this Collection</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">{sourceData.collection.description}</p>
+              <h4 className="font-medium text-foreground mb-2">
+                About this Collection
+              </h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {sourceData.collection.description}
+              </p>
             </div>
           </div>
 
           <Separator />
 
           <div>
-            <h4 className="font-medium text-foreground mb-2">Compilation Methodology</h4>
-            <p className="text-sm text-muted-foreground leading-relaxed">{sourceData.collection.methodology}</p>
+            <h4 className="font-medium text-foreground mb-2">
+              Compilation Methodology
+            </h4>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {sourceData.collection.methodology}
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -132,15 +159,23 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
         <CardContent className="space-y-4">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-semibold text-foreground">{sourceData.book.name}</h3>
-              <p className="text-sm text-muted-foreground arabic-text">{sourceData.book.arabicName}</p>
+              <h3 className="font-semibold text-foreground">
+                {sourceData.book.name}
+              </h3>
+              <p className="text-sm text-muted-foreground arabic-text">
+                {sourceData.book.arabicName}
+              </p>
             </div>
             <div className="text-right">
               <Badge variant="outline">Book {sourceData.book.number}</Badge>
-              <p className="text-sm text-muted-foreground mt-1">{sourceData.book.hadithCount} hadith</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {sourceData.book.hadithCount} hadith
+              </p>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">{sourceData.book.description}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            {sourceData.book.description}
+          </p>
         </CardContent>
       </Card>
 
@@ -160,17 +195,25 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
                   <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-sm font-medium text-secondary">
                     {index + 1}
                   </div>
-                  {index < sourceData.chainOfNarration.length - 1 && <div className="w-px h-8 bg-border mt-2"></div>}
+                  {index < sourceData.chainOfNarration.length - 1 && (
+                    <div className="w-px h-8 bg-border mt-2"></div>
+                  )}
                 </div>
                 <div className="flex-1 pb-4">
                   <div className="flex items-start justify-between mb-1">
-                    <h4 className="font-medium text-foreground">{narrator.name}</h4>
+                    <h4 className="font-medium text-foreground">
+                      {narrator.name}
+                    </h4>
                     <Badge variant="secondary" className="text-xs">
                       {narrator.reliability}
                     </Badge>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-1">{narrator.role}</p>
-                  <p className="text-xs text-muted-foreground">{narrator.dates}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    {narrator.role}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {narrator.dates}
+                  </p>
                 </div>
               </div>
             ))}
@@ -189,8 +232,12 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
         <CardContent className="space-y-4">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="font-semibold text-foreground">{sourceData.hadith.narratorInfo.fullName}</h3>
-              <p className="text-sm text-secondary font-medium">{sourceData.hadith.narratorInfo.title}</p>
+              <h3 className="font-semibold text-foreground">
+                {sourceData.hadith.narratorInfo.fullName}
+              </h3>
+              <p className="text-sm text-secondary font-medium">
+                {sourceData.hadith.narratorInfo.title}
+              </p>
             </div>
             <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
               {sourceData.hadith.narratorInfo.reliability}
@@ -202,16 +249,22 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-secondary" />
-                  <span className="text-muted-foreground">{sourceData.hadith.narratorInfo.dates}</span>
+                  <span className="text-muted-foreground">
+                    {sourceData.hadith.narratorInfo.dates}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-secondary" />
-                  <span className="text-muted-foreground">{sourceData.hadith.narratorInfo.relationship}</span>
+                  <span className="text-muted-foreground">
+                    {sourceData.hadith.narratorInfo.relationship}
+                  </span>
                 </div>
               </div>
             </div>
             <div>
-              <h4 className="font-medium text-foreground mb-2">Reliability Assessment</h4>
+              <h4 className="font-medium text-foreground mb-2">
+                Reliability Assessment
+              </h4>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {sourceData.hadith.narratorInfo.reliability}
               </p>
@@ -230,15 +283,24 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start bg-transparent">
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-transparent"
+            >
               <BookOpen className="h-4 w-4 mr-2" />
               View Complete Collection
             </Button>
-            <Button variant="outline" className="w-full justify-start bg-transparent">
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-transparent"
+            >
               <User className="h-4 w-4 mr-2" />
               Learn About the Author
             </Button>
-            <Button variant="outline" className="w-full justify-start bg-transparent">
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-transparent"
+            >
               <ExternalLink className="h-4 w-4 mr-2" />
               Cross-Reference in Other Collections
             </Button>
@@ -246,5 +308,5 @@ export function SourceDetails({ hadithId }: SourceDetailsProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

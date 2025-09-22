@@ -16,6 +16,7 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  Loader2,
   Share,
   Star,
   Volume2,
@@ -37,6 +38,11 @@ export function HadithCard({
   const [isExplanationOpen, setIsExplanationOpen] = useState(showExplanation);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isStarred, setIsStarred] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(
+    null
+  );
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const getGradeColor = (grade: string) => {
     switch (grade.toLowerCase()) {
@@ -83,6 +89,78 @@ export function HadithCard({
     }
   };
 
+  const handlePlayAudio = async () => {
+    console.log("[v0] Audio button clicked for hadith:", hadith.hadithNumber);
+
+    if (currentAudio && isPlaying) {
+      // Stop current audio
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+      setIsPlaying(false);
+      setCurrentAudio(null);
+      return;
+    }
+
+    setIsLoadingAudio(true);
+
+    try {
+      console.log(
+        "[v0] Requesting TTS for Arabic text:",
+        hadith.textArabic.substring(0, 50) + "..."
+      );
+
+      const response = await fetch("/api/text-to-speech", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: hadith.textArabic,
+          voice: "ar-SA-ZariyahNeural",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      console.log("[v0] TTS API response received");
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+
+      const audio = new Audio();
+      audio.src = audioUrl;
+
+      audio.onplay = () => {
+        console.log("[v0] Audio started playing");
+        setIsPlaying(true);
+      };
+
+      audio.onended = () => {
+        console.log("[v0] Audio finished playing");
+        setIsPlaying(false);
+        setCurrentAudio(null);
+        URL.revokeObjectURL(audioUrl);
+      };
+
+      audio.onerror = (e) => {
+        console.error("[v0] Audio playback error:", e);
+        toast.error("Failed to play audio");
+        setIsPlaying(false);
+        setCurrentAudio(null);
+      };
+
+      setCurrentAudio(audio);
+      await audio.play();
+      toast.success("Playing Arabic recitation");
+    } catch (error) {
+      console.error("[v0] TTS Error:", error);
+      toast.error("Failed to generate audio. Please try again.");
+    } finally {
+      setIsLoadingAudio(false);
+    }
+  };
+
   return (
     <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-br from-background to-background/50">
       <CardHeader className={compact ? "pb-3" : "pb-4"}>
@@ -124,8 +202,20 @@ export function HadithCard({
             <span className="text-sm font-medium text-muted-foreground">
               Arabic Text
             </span>
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-              <Volume2 className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-primary/10"
+              onClick={handlePlayAudio}
+              disabled={isLoadingAudio}
+            >
+              {isLoadingAudio ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Volume2
+                  className={`h-4 w-4 ${isPlaying ? "text-primary" : ""}`}
+                />
+              )}
             </Button>
           </div>
           <p
