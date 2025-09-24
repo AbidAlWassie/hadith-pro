@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getRandomHadith, type Hadith } from "@/lib/hadith-api";
+import { getRandomHadith, searchHadiths, type Hadith } from "@/lib/hadith-api";
 import {
   BookOpen,
   Grid,
@@ -103,6 +103,8 @@ export function BrowseInterface() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sampleHadiths, setSampleHadiths] = useState<Hadith[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [categoryHadiths, setCategoryHadiths] = useState<Hadith[]>([]);
+  const [isCategoryLoading, setIsCategoryLoading] = useState(false);
 
   const loadSampleHadiths = async () => {
     setIsLoading(true);
@@ -115,6 +117,50 @@ export function BrowseInterface() {
       setSampleHadiths(hadiths);
     } catch (error) {
       console.error("Failed to load sample hadiths:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadCategoryHadiths = async (categoryId: string) => {
+    setIsCategoryLoading(true);
+    setCategoryHadiths([]);
+
+    try {
+      const categorySearchTerms: Record<string, string> = {
+        faith: "faith belief iman",
+        worship: "prayer salah worship",
+        character: "character manners akhlaq",
+        law: "law fiqh ruling",
+        prophetic: "prophet guidance",
+        social: "family social community",
+      };
+
+      const searchTerm = categorySearchTerms[categoryId] || categoryId;
+      const hadiths = await searchHadiths(searchTerm, {
+        collection:
+          selectedCollection === "all" ? undefined : selectedCollection,
+      });
+      setCategoryHadiths(hadiths);
+    } catch (error) {
+      console.error("Failed to load category hadiths:", error);
+    } finally {
+      setIsCategoryLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    setIsLoading(true);
+    try {
+      const results = await searchHadiths(searchQuery, {
+        collection:
+          selectedCollection === "all" ? undefined : selectedCollection,
+      });
+      setSampleHadiths(results);
+    } catch (error) {
+      console.error("Search failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -133,6 +179,7 @@ export function BrowseInterface() {
                 className="pl-10 h-12 text-lg border-2"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
             </div>
 
@@ -153,6 +200,14 @@ export function BrowseInterface() {
                   ))}
                 </SelectContent>
               </Select>
+
+              <Button
+                onClick={handleSearch}
+                disabled={isLoading}
+                className="h-12 px-6"
+              >
+                {isLoading ? "Searching..." : "Search"}
+              </Button>
 
               <div className="flex border-2 border-border rounded-lg">
                 <Button
@@ -186,7 +241,7 @@ export function BrowseInterface() {
             Browse by Collection
           </TabsTrigger>
           <TabsTrigger value="recent" className="text-base">
-            Recently Added
+            Search Results
           </TabsTrigger>
         </TabsList>
 
@@ -204,6 +259,7 @@ export function BrowseInterface() {
                 <Card
                   key={category.id}
                   className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/30"
+                  onClick={() => loadCategoryHadiths(category.id)}
                 >
                   <CardHeader className="pb-4">
                     <div className="flex items-start justify-between">
@@ -235,7 +291,13 @@ export function BrowseInterface() {
                     <p className="text-muted-foreground leading-relaxed mb-4">
                       {category.description}
                     </p>
-                    <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
+                    <Button
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        loadCategoryHadiths(category.id);
+                      }}
+                    >
                       Explore Category
                     </Button>
                   </CardContent>
@@ -243,6 +305,25 @@ export function BrowseInterface() {
               );
             })}
           </div>
+
+          {isCategoryLoading && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">Loading hadiths...</p>
+            </div>
+          )}
+
+          {categoryHadiths.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-foreground">
+                Category Results
+              </h3>
+              <div className="grid gap-6">
+                {categoryHadiths.map((hadith) => (
+                  <HadithCard key={hadith.id} hadith={hadith} />
+                ))}
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="collections" className="space-y-6">
@@ -302,7 +383,9 @@ export function BrowseInterface() {
         <TabsContent value="recent" className="space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-xl font-semibold text-foreground">
-              Recently Added Hadith
+              {searchQuery
+                ? `Search Results for "${searchQuery}"`
+                : "Search Results"}
             </h3>
             <Button
               onClick={loadSampleHadiths}
@@ -323,10 +406,12 @@ export function BrowseInterface() {
             <Card className="p-12 text-center">
               <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-foreground mb-2">
-                No Recent Hadith Loaded
+                {searchQuery ? "No results found" : "No Search Results"}
               </h3>
               <p className="text-muted-foreground mb-4">
-                Click "Load Sample" to see recently added hadith
+                {searchQuery
+                  ? "Try different keywords or browse by category"
+                  : "Enter a search term or click 'Load Sample' to see hadiths"}
               </p>
             </Card>
           )}

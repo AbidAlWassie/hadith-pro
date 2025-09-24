@@ -8,19 +8,23 @@ export default function HomePage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-12">
+        <div className="mb-8">
           <HadithSearch />
         </div>
 
-        <div className="mb-16">
-          <HadithCollections />
-        </div>
+        <div className="grid lg:grid-cols-3 gap-8 mb-8">
+          <div className="lg:col-span-2">
+            <HadithCollections />
+          </div>
 
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
-            Featured Hadith
-          </h2>
-          <FeaturedHadith />
+          <div className="lg:col-span-1">
+            <div className="sticky top-8">
+              <h2 className="text-xl font-bold text-foreground mb-4">
+                Featured Hadith
+              </h2>
+              <FeaturedHadith />
+            </div>
+          </div>
         </div>
       </main>
     </div>
