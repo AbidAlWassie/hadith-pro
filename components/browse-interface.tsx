@@ -109,6 +109,7 @@ export function BrowseInterface() {
   const [collectionHadiths, setCollectionHadiths] = useState<Hadith[]>([]);
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const [selectedCollectionName, setSelectedCollectionName] = useState("");
+  const [activeTab, setActiveTab] = useState("collections");
 
   const loadSampleHadiths = async () => {
     setIsLoading(true);
@@ -185,6 +186,7 @@ export function BrowseInterface() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
+    setActiveTab("recent");
     setIsLoading(true);
     try {
       const results = await searchHadiths(searchQuery, {
@@ -265,13 +267,13 @@ export function BrowseInterface() {
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="categories" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-12">
-          <TabsTrigger value="categories" className="text-base">
-            Browse by Topic
-          </TabsTrigger>
           <TabsTrigger value="collections" className="text-base">
             Browse by Collection
+          </TabsTrigger>
+          <TabsTrigger value="categories" className="text-base">
+            Browse by Topic
           </TabsTrigger>
           <TabsTrigger value="recent" className="text-base">
             Search Results

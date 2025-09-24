@@ -22,6 +22,7 @@ import {
   Star,
   Volume2,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -482,18 +483,24 @@ export function HadithCard({
           </div>
 
           {!compact && (
-            <Button
-              variant="outline"
-              size="sm"
-              className={`font-medium bg-transparent ${
-                variant === "featured"
-                  ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground border-0 hover:from-primary/90 hover:to-secondary/90 gap-2 font-semibold"
-                  : ""
-              }`}
+            <Link
+              href={`/browse/${hadith.collection.toLowerCase()}/${hadith.book
+                .toLowerCase()
+                .replace(/\s+/g, "-")}/${hadith.id}`}
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              View Details
-            </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className={`font-medium bg-transparent ${
+                  variant === "featured"
+                    ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground border-0 hover:from-primary/90 hover:to-secondary/90 gap-2 font-semibold"
+                    : ""
+                }`}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                View Details
+              </Button>
+            </Link>
           )}
         </div>
       </CardContent>
