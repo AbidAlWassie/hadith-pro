@@ -12,7 +12,7 @@ const mainCollections = [
     hadithCount: 7563,
     color:
       "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
-    href: "/browse?collection=bukhari",
+    href: "/browse/bukhari",
   },
   {
     id: "muslim",
@@ -21,7 +21,7 @@ const mainCollections = [
     description: "Second most authentic hadith collection",
     hadithCount: 5362,
     color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
-    href: "/browse?collection=muslim",
+    href: "/browse/muslim",
   },
   {
     id: "tirmidhi",
@@ -31,7 +31,7 @@ const mainCollections = [
     hadithCount: 3956,
     color:
       "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
-    href: "/browse?collection=tirmidhi",
+    href: "/browse/tirmidhi",
   },
   {
     id: "abudawud",
@@ -41,7 +41,7 @@ const mainCollections = [
     hadithCount: 4800,
     color:
       "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
-    href: "/browse?collection=abudawud",
+    href: "/browse/abudawud",
   },
 ];
 
@@ -51,28 +51,28 @@ const otherCollections = [
     title: "Sunan an-Nasa'i",
     titleArabic: "سنن النسائي",
     hadithCount: 5761,
-    href: "/browse?collection=nasai",
+    href: "/browse/nasai",
   },
   {
     id: "ibnmajah",
     title: "Sunan Ibn Majah",
     titleArabic: "سنن ابن ماجه",
     hadithCount: 4341,
-    href: "/browse?collection=ibnmajah",
+    href: "/browse/ibnmajah",
   },
   {
     id: "nawawi40",
     title: "An-Nawawi's 40 Hadith",
     titleArabic: "الأربعون النووية",
     hadithCount: 42,
-    href: "/browse?collection=nawawi40",
+    href: "/browse/nawawi40",
   },
   {
     id: "riyadussalihin",
     title: "Riyad as-Salihin",
     titleArabic: "رياض الصالحين",
     hadithCount: 1896,
-    href: "/browse?collection=riyadussalihin",
+    href: "/browse/riyadussalihin",
   },
 ];
 
