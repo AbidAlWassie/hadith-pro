@@ -39,10 +39,16 @@ export function Header() {
 
             <nav className="hidden md:flex items-center gap-1">
               <Link
-                href="/browse"
+                href="/saved"
                 className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-all"
               >
-                Browse
+                Bookmarks
+              </Link>
+              <Link
+                href="/study"
+                className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-all"
+              >
+                Progression
               </Link>
               <Link
                 href="/collections"
@@ -55,12 +61,6 @@ export function Header() {
                 className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-all"
               >
                 Sources
-              </Link>
-              <Link
-                href="/study"
-                className="px-3 py-2 text-sm font-medium text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-all"
-              >
-                Study Tools
               </Link>
             </nav>
           </div>
