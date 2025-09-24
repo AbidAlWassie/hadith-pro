@@ -45,7 +45,7 @@ export default function SavedHadithsPage() {
     } else {
       setIsLoading(false);
     }
-  }, [savedHadiths.length, favoriteHadiths.length]);
+  }, [JSON.stringify(savedHadiths), JSON.stringify(favoriteHadiths)]);
 
   if (isLoading) {
     return (
