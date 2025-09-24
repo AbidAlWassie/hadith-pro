@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: "Hadith Study - Islamic Research Platform",
   description:
     "Modern platform for studying and researching hadith with authentic sources and scholarly references",
-  generator: "v0.app",
 };
 
 export default function RootLayout({

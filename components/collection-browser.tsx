@@ -3,11 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  searchHadiths,
-  type Hadith,
-  type HadithCollection,
-} from "@/lib/hadith-api";
+import type { Hadith, HadithCollection } from "@/lib/hadith-api";
 import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -45,13 +41,12 @@ export function CollectionBrowser({ collection }: CollectionBrowserProps) {
       );
       setChapters(generatedChapters);
 
-      const sampleHadiths = await searchHadiths("", {
-        collection: collection.id,
-      });
-      setRecentHadiths(sampleHadiths.slice(0, 6));
+      // Commented out hadith loading section as hadiths should only be loaded in chapter pages
+      // const sampleHadiths = await searchHadiths("", { collection: collection.id })
+      // setRecentHadiths(sampleHadiths.slice(0, 6))
 
       console.log(
-        `[v0] Loaded ${sampleHadiths.length} sample hadiths for collection ${collection.id}`
+        `[v0] Loaded ${collection.totalHadiths} hadiths for collection ${collection.id}`
       );
     } catch (error) {
       console.error("Failed to load collection data:", error);
@@ -231,9 +226,7 @@ export function CollectionBrowser({ collection }: CollectionBrowserProps) {
       {/* Recent Hadiths from Collection */}
       {/* {recentHadiths.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-foreground mb-6">
-            Recent Hadiths from {collection.name}
-          </h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Recent Hadiths from {collection.name}</h2>
           <div className="grid gap-6">
             {recentHadiths.map((hadith) => (
               <HadithCard key={hadith.id} hadith={hadith} />
