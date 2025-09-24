@@ -447,21 +447,107 @@ export async function getRandomHadith(): Promise<Hadith> {
 
 export async function getHadithById(id: string): Promise<Hadith | null> {
   try {
-    const [collection, hadithNumber] = id.split("-");
-    if (!collection || !hadithNumber) return null;
+    console.log(`[v0] Getting hadith by ID: ${id}`);
+    let collection: string;
+    let hadithNumber: string;
 
-    const data = await fetchWithFallback(
-      `${BASE_URL}/editions/${collection}/${hadithNumber}`
-    );
-
-    if (data.hadithnumber) {
-      return transformApiHadith(
-        data,
-        collection,
-        Number.parseInt(hadithNumber)
-      );
+    if (id.includes("-")) {
+      // Old format: "bukhari-1"
+      [collection, hadithNumber] = id.split("-");
+    } else {
+      // This shouldn't happen with current implementation, but keeping for safety
+      console.error(`[v0] Invalid ID format: ${id}`);
+      return null;
     }
 
+    if (!collection || !hadithNumber) {
+      console.log(`[v0] Invalid ID format: ${id}`);
+      return null;
+    }
+
+    // Try to find the hadith by searching through sections
+    const hadithNum = Number.parseInt(hadithNumber);
+
+    // Calculate which section this hadith might be in (rough estimate)
+    const estimatedSection = Math.max(1, Math.floor(hadithNum / 100) || 1);
+
+    // Try a few sections around the estimated section
+    for (
+      let sectionNum = Math.max(1, estimatedSection - 2);
+      sectionNum <= estimatedSection + 5;
+      sectionNum++
+    ) {
+      try {
+        const bothLanguages = await fetchHadithWithBothLanguages(
+          collection,
+          sectionNum
+        );
+
+        if (bothLanguages?.english || bothLanguages?.arabic) {
+          const englishData = bothLanguages.english;
+          const arabicData = bothLanguages.arabic;
+
+          const englishHadiths = englishData?.hadiths || [];
+          const arabicHadiths = arabicData?.hadiths || [];
+
+          // Look for the specific hadith number in this section
+          for (
+            let i = 0;
+            i < Math.max(englishHadiths.length, arabicHadiths.length);
+            i++
+          ) {
+            const englishHadith = englishHadiths[i];
+            const arabicHadith = arabicHadiths[i];
+
+            const currentHadithNumber =
+              englishHadith?.hadithnumber ||
+              arabicHadith?.hadithnumber ||
+              sectionNum * 100 + i + 1;
+
+            if (
+              currentHadithNumber === hadithNum ||
+              `${collection}-${currentHadithNumber}` === id
+            ) {
+              console.log(`[v0] Found hadith ${id} in section ${sectionNum}`);
+
+              return {
+                id: `${collection}-${currentHadithNumber}`,
+                text:
+                  englishHadith?.text ||
+                  englishHadith?.hadith ||
+                  "English text not available",
+                textArabic:
+                  arabicHadith?.text ||
+                  arabicHadith?.hadith ||
+                  "النص العربي غير متوفر",
+                narrator:
+                  englishHadith?.narrator ||
+                  arabicHadith?.narrator ||
+                  "Various",
+                collection: collection,
+                book: `Book ${
+                  englishHadith?.reference?.book ||
+                  arabicHadith?.reference?.book ||
+                  sectionNum
+                }`,
+                chapter:
+                  englishHadith?.chapter ||
+                  arabicHadith?.chapter ||
+                  `Section ${sectionNum}`,
+                hadithNumber: currentHadithNumber.toString(),
+                grade: getGradeFromHadith(englishHadith || arabicHadith),
+                reference: `${collection} ${currentHadithNumber}`,
+              };
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`[v0] Error checking section ${sectionNum}:`, error);
+        continue;
+      }
+    }
+
+    console.log(`[v0] Hadith ${id} not found in any section`);
     return null;
   } catch (error) {
     console.error("[v0] Error getting hadith by ID:", error);

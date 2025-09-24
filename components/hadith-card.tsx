@@ -484,9 +484,12 @@ export function HadithCard({
 
           {!compact && (
             <Link
-              href={`/browse/${hadith.collection.toLowerCase()}/${hadith.book
-                .toLowerCase()
-                .replace(/\s+/g, "-")}/${hadith.id}`}
+              href={`/browse/${hadith.collection.toLowerCase()}/${
+                hadith.book
+                  .toLowerCase()
+                  .replace(/book\s*/i, "")
+                  .trim() || "1"
+              }/${hadith.hadithNumber}`}
             >
               <Button
                 variant="outline"

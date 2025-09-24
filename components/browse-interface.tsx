@@ -106,9 +106,6 @@ export function BrowseInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [categoryHadiths, setCategoryHadiths] = useState<Hadith[]>([]);
   const [isCategoryLoading, setIsCategoryLoading] = useState(false);
-  const [collectionHadiths, setCollectionHadiths] = useState<Hadith[]>([]);
-  const [isCollectionLoading, setIsCollectionLoading] = useState(false);
-  const [selectedCollectionName, setSelectedCollectionName] = useState("");
   const [activeTab, setActiveTab] = useState("collections");
 
   const loadSampleHadiths = async () => {
@@ -124,28 +121,6 @@ export function BrowseInterface() {
       console.error("Failed to load sample hadiths:", error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const loadCollectionHadiths = async (
-    collectionId: string,
-    collectionName: string
-  ) => {
-    setIsCollectionLoading(true);
-    setCollectionHadiths([]);
-    setSelectedCollectionName(collectionName);
-
-    try {
-      console.log(`[v0] Loading hadiths from collection: ${collectionId}`);
-      const hadiths = await searchHadiths("", {
-        collection: collectionId,
-      });
-      setCollectionHadiths(hadiths);
-      console.log(`[v0] Loaded ${hadiths.length} hadiths from ${collectionId}`);
-    } catch (error) {
-      console.error("Failed to load collection hadiths:", error);
-    } finally {
-      setIsCollectionLoading(false);
     }
   };
 
