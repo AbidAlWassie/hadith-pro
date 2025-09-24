@@ -25,6 +25,7 @@ import {
   Volume2,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { HadithCard } from "./hadith-card";
 
@@ -373,79 +374,48 @@ export function BrowseInterface() {
             }`}
           >
             {collections.map((collection) => (
-              <Card
-                key={collection.id}
-                className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/30"
-                onClick={() =>
-                  loadCollectionHadiths(collection.id, collection.name)
-                }
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">
-                        {collection.name}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {collection.count} hadith
-                        </Badge>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 text-yellow-500 fill-current" />
-                          <span className="text-xs text-muted-foreground">
-                            {collection.authenticity}%
-                          </span>
+              <Link key={collection.id} href={`/browse/${collection.id}`}>
+                <Card className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/30">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-lg text-foreground group-hover:text-primary transition-colors">
+                          {collection.name}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs">
+                            {collection.count} hadith
+                          </Badge>
+                          <div className="flex items-center gap-1">
+                            <Star className="h-3 w-3 text-yellow-500 fill-current" />
+                            <span className="text-xs text-muted-foreground">
+                              {collection.authenticity}%
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                      </div>
                     </div>
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <BookOpen className="h-5 w-5 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${collection.authenticity}%` }}
+                        />
+                      </div>
+                      <div className="text-center text-sm text-muted-foreground">
+                        Click to browse collection
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${collection.authenticity}%` }}
-                      />
-                    </div>
-                    <Button
-                      className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        loadCollectionHadiths(collection.id, collection.name);
-                      }}
-                    >
-                      Browse Collection
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
-
-          {isCollectionLoading && (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">
-                Loading hadiths from {selectedCollectionName}...
-              </p>
-            </div>
-          )}
-
-          {collectionHadiths.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-foreground">
-                {selectedCollectionName} - {collectionHadiths.length} Hadiths
-              </h3>
-              <div className="grid gap-6">
-                {collectionHadiths.map((hadith) => (
-                  <HadithCard key={hadith.id} hadith={hadith} />
-                ))}
-              </div>
-            </div>
-          )}
         </TabsContent>
 
         <TabsContent value="recent" className="space-y-6">
