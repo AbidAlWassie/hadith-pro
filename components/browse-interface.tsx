@@ -105,6 +105,9 @@ export function BrowseInterface() {
   const [isLoading, setIsLoading] = useState(false);
   const [categoryHadiths, setCategoryHadiths] = useState<Hadith[]>([]);
   const [isCategoryLoading, setIsCategoryLoading] = useState(false);
+  const [collectionHadiths, setCollectionHadiths] = useState<Hadith[]>([]);
+  const [isCollectionLoading, setIsCollectionLoading] = useState(false);
+  const [selectedCollectionName, setSelectedCollectionName] = useState("");
 
   const loadSampleHadiths = async () => {
     setIsLoading(true);
@@ -122,26 +125,55 @@ export function BrowseInterface() {
     }
   };
 
+  const loadCollectionHadiths = async (
+    collectionId: string,
+    collectionName: string
+  ) => {
+    setIsCollectionLoading(true);
+    setCollectionHadiths([]);
+    setSelectedCollectionName(collectionName);
+
+    try {
+      console.log(`[v0] Loading hadiths from collection: ${collectionId}`);
+      const hadiths = await searchHadiths("", {
+        collection: collectionId,
+      });
+      setCollectionHadiths(hadiths);
+      console.log(`[v0] Loaded ${hadiths.length} hadiths from ${collectionId}`);
+    } catch (error) {
+      console.error("Failed to load collection hadiths:", error);
+    } finally {
+      setIsCollectionLoading(false);
+    }
+  };
+
   const loadCategoryHadiths = async (categoryId: string) => {
     setIsCategoryLoading(true);
     setCategoryHadiths([]);
+    setSelectedCategory(categoryId);
 
     try {
       const categorySearchTerms: Record<string, string> = {
-        faith: "faith belief iman",
-        worship: "prayer salah worship",
-        character: "character manners akhlaq",
-        law: "law fiqh ruling",
-        prophetic: "prophet guidance",
-        social: "family social community",
+        faith: "faith belief iman tawhid",
+        worship: "prayer salah worship dhikr",
+        character: "character manners akhlaq ethics",
+        law: "law fiqh ruling jurisprudence",
+        prophetic: "prophet guidance sunnah",
+        social: "family social community marriage",
       };
 
       const searchTerm = categorySearchTerms[categoryId] || categoryId;
+      console.log(
+        `[v0] Loading category hadiths for: ${categoryId} with search term: ${searchTerm}`
+      );
       const hadiths = await searchHadiths(searchTerm, {
         collection:
           selectedCollection === "all" ? undefined : selectedCollection,
       });
       setCategoryHadiths(hadiths);
+      console.log(
+        `[v0] Loaded ${hadiths.length} hadiths for category ${categoryId}`
+      );
     } catch (error) {
       console.error("Failed to load category hadiths:", error);
     } finally {
@@ -308,14 +340,20 @@ export function BrowseInterface() {
 
           {isCategoryLoading && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">Loading hadiths...</p>
+              <p className="text-muted-foreground">
+                Loading hadiths for {selectedCategory}...
+              </p>
             </div>
           )}
 
           {categoryHadiths.length > 0 && (
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-foreground">
-                Category Results
+                {
+                  browseCategories.find((cat) => cat.id === selectedCategory)
+                    ?.title
+                }{" "}
+                - {categoryHadiths.length} Hadiths
               </h3>
               <div className="grid gap-6">
                 {categoryHadiths.map((hadith) => (
@@ -338,6 +376,9 @@ export function BrowseInterface() {
               <Card
                 key={collection.id}
                 className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/30"
+                onClick={() =>
+                  loadCollectionHadiths(collection.id, collection.name)
+                }
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
@@ -370,7 +411,13 @@ export function BrowseInterface() {
                         style={{ width: `${collection.authenticity}%` }}
                       />
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
+                    <Button
+                      className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        loadCollectionHadiths(collection.id, collection.name);
+                      }}
+                    >
                       Browse Collection
                     </Button>
                   </div>
@@ -378,6 +425,27 @@ export function BrowseInterface() {
               </Card>
             ))}
           </div>
+
+          {isCollectionLoading && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">
+                Loading hadiths from {selectedCollectionName}...
+              </p>
+            </div>
+          )}
+
+          {collectionHadiths.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-foreground">
+                {selectedCollectionName} - {collectionHadiths.length} Hadiths
+              </h3>
+              <div className="grid gap-6">
+                {collectionHadiths.map((hadith) => (
+                  <HadithCard key={hadith.id} hadith={hadith} />
+                ))}
+              </div>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="recent" className="space-y-6">

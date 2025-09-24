@@ -186,10 +186,12 @@ function transformApiHadithWithArabic(
       "English text not available",
     textArabic:
       arabicHadith?.text || arabicHadith?.hadith || "النص العربي غير متوفر",
-    narrator: englishHadith?.narrator || "Various",
+    narrator: englishHadith?.narrator || arabicHadith?.narrator || "Various",
     collection: collectionName,
-    book: `Book ${englishHadith?.reference?.book || 1}`,
-    chapter: englishHadith?.chapter || "Chapter",
+    book: `Book ${
+      englishHadith?.reference?.book || arabicHadith?.reference?.book || 1
+    }`,
+    chapter: englishHadith?.chapter || arabicHadith?.chapter || "Chapter",
     hadithNumber: hadithNumber.toString(),
     grade: gradeMap[grade.toLowerCase()] || "Unknown",
     reference: `${collectionName} ${hadithNumber}`,
@@ -240,8 +242,7 @@ export async function searchHadiths(
 
     for (const collectionId of collections) {
       try {
-        // Try to get a few sections to search through
-        for (let sectionNum = 1; sectionNum <= 5; sectionNum++) {
+        for (let sectionNum = 1; sectionNum <= 10; sectionNum++) {
           const bothLanguages = await fetchHadithWithBothLanguages(
             collectionId,
             sectionNum
@@ -251,43 +252,70 @@ export async function searchHadiths(
             const englishData = bothLanguages.english;
             const arabicData = bothLanguages.arabic;
 
-            // Extract hadiths from the section
             const englishHadiths = englishData?.hadiths || [];
             const arabicHadiths = arabicData?.hadiths || [];
 
-            for (
-              let i = 0;
-              i < Math.max(englishHadiths.length, arabicHadiths.length);
-              i++
-            ) {
+            const maxLength = Math.max(
+              englishHadiths.length,
+              arabicHadiths.length
+            );
+
+            for (let i = 0; i < maxLength; i++) {
               const englishHadith = englishHadiths[i];
               const arabicHadith = arabicHadiths[i];
 
               if (englishHadith || arabicHadith) {
-                const text = englishHadith?.text || englishHadith?.hadith || "";
+                const englishText =
+                  englishHadith?.text || englishHadith?.hadith || "";
                 const arabicText =
                   arabicHadith?.text || arabicHadith?.hadith || "";
 
-                // Check if query matches English or Arabic text
-                if (
+                const matchesQuery =
                   !query ||
-                  text.toLowerCase().includes(query.toLowerCase()) ||
-                  arabicText.includes(query)
-                ) {
-                  const hadith = transformApiHadithWithArabic(
-                    englishHadith,
-                    arabicHadith,
-                    collectionId,
-                    sectionNum * 100 + i + 1
-                  );
+                  englishText.toLowerCase().includes(query.toLowerCase()) ||
+                  arabicText.includes(query) ||
+                  (englishHadith?.narrator &&
+                    englishHadith.narrator
+                      .toLowerCase()
+                      .includes(query.toLowerCase()));
+
+                if (matchesQuery) {
+                  const hadithNumber =
+                    englishHadith?.hadithnumber ||
+                    arabicHadith?.hadithnumber ||
+                    sectionNum * 100 + i + 1;
+
+                  const hadith: Hadith = {
+                    id: `${collectionId}-${hadithNumber}`,
+                    text: englishText || "English text not available",
+                    textArabic: arabicText || "النص العربي غير متوفر",
+                    narrator:
+                      englishHadith?.narrator ||
+                      arabicHadith?.narrator ||
+                      "Various",
+                    collection: collectionId,
+                    book: `Book ${
+                      englishHadith?.reference?.book ||
+                      arabicHadith?.reference?.book ||
+                      sectionNum
+                    }`,
+                    chapter:
+                      englishHadith?.chapter ||
+                      arabicHadith?.chapter ||
+                      `Section ${sectionNum}`,
+                    hadithNumber: hadithNumber.toString(),
+                    grade: getGradeFromHadith(englishHadith || arabicHadith),
+                    reference: `${collectionId} ${hadithNumber}`,
+                  };
+
                   allResults.push(hadith);
 
-                  if (allResults.length >= 20) break;
+                  if (allResults.length >= 50) break;
                 }
               }
             }
 
-            if (allResults.length >= 20) break;
+            if (allResults.length >= 50) break;
           }
         }
       } catch (error) {
@@ -311,12 +339,34 @@ export async function searchHadiths(
   }
 }
 
+function getGradeFromHadith(hadith: any): Hadith["grade"] {
+  if (
+    !hadith?.grades ||
+    !Array.isArray(hadith.grades) ||
+    hadith.grades.length === 0
+  ) {
+    return "Unknown";
+  }
+
+  const grade = hadith.grades[0]?.grade?.toLowerCase() || "unknown";
+  const gradeMap: Record<string, Hadith["grade"]> = {
+    sahih: "Sahih",
+    hasan: "Hasan",
+    daif: "Da'if",
+    "da'if": "Da'if",
+    mawdu: "Mawdu'",
+    "mawdu'": "Mawdu'",
+  };
+
+  return gradeMap[grade] || "Unknown";
+}
+
 export async function getRandomHadith(): Promise<Hadith> {
   try {
     const collections = ["bukhari", "muslim", "abudawud"];
     const randomCollection =
       collections[Math.floor(Math.random() * collections.length)];
-    const randomSection = Math.floor(Math.random() * 10) + 1;
+    const randomSection = Math.floor(Math.random() * 20) + 1; // Increased range
 
     console.log(
       `[v0] Getting random hadith from ${randomCollection}, section ${randomSection}`
@@ -342,12 +392,37 @@ export async function getRandomHadith(): Promise<Hadith> {
         const englishHadith = englishHadiths[randomIndex];
         const arabicHadith = arabicHadiths[randomIndex];
 
-        return transformApiHadithWithArabic(
-          englishHadith,
-          arabicHadith,
-          randomCollection,
-          randomSection * 100 + randomIndex + 1
-        );
+        const hadithNumber =
+          englishHadith?.hadithnumber ||
+          arabicHadith?.hadithnumber ||
+          randomSection * 100 + randomIndex + 1;
+
+        return {
+          id: `${randomCollection}-${hadithNumber}`,
+          text:
+            englishHadith?.text ||
+            englishHadith?.hadith ||
+            "English text not available",
+          textArabic:
+            arabicHadith?.text ||
+            arabicHadith?.hadith ||
+            "النص العربي غير متوفر",
+          narrator:
+            englishHadith?.narrator || arabicHadith?.narrator || "Various",
+          collection: randomCollection,
+          book: `Book ${
+            englishHadith?.reference?.book ||
+            arabicHadith?.reference?.book ||
+            randomSection
+          }`,
+          chapter:
+            englishHadith?.chapter ||
+            arabicHadith?.chapter ||
+            `Section ${randomSection}`,
+          hadithNumber: hadithNumber.toString(),
+          grade: getGradeFromHadith(englishHadith || arabicHadith),
+          reference: `${randomCollection} ${hadithNumber}`,
+        };
       }
     }
 
