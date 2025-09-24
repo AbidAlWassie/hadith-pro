@@ -1,6 +1,7 @@
 "use client";
 
 import { HadithCard } from "@/components/hadith-card";
+import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -51,6 +52,7 @@ export default function SavedHadithsPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center gap-3 mb-8">
+          <Header />
           <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
             <Heart className="h-6 w-6 text-white" />
           </div>

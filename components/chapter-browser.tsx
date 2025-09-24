@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  searchHadiths,
+  getHadithsByChapter,
   type Hadith,
   type HadithCollection,
 } from "@/lib/hadith-api";
@@ -36,23 +36,22 @@ export function ChapterBrowser({
   const loadChapterHadiths = async () => {
     setIsLoading(true);
     try {
-      const allHadiths = await searchHadiths("", { collection: collection.id });
-
-      const startIndex = (chapterNumber - 1) * 50;
-      const endIndex = chapterNumber * 50;
-      const chapterHadiths = allHadiths.slice(startIndex, endIndex);
-
-      const startPageIndex = (currentPage - 1) * hadithsPerPage;
-      const endPageIndex = startPageIndex + hadithsPerPage;
-      const paginatedHadiths = chapterHadiths.slice(
-        startPageIndex,
-        endPageIndex
+      const result = await getHadithsByChapter(
+        collection.id,
+        chapterNumber,
+        currentPage,
+        hadithsPerPage
       );
+      setHadiths(result.hadiths);
+      setTotalPages(result.totalPages);
 
-      setHadiths(paginatedHadiths);
-      setTotalPages(Math.ceil(chapterHadiths.length / hadithsPerPage));
+      console.log(
+        `[v0] Loaded ${result.hadiths.length} hadiths for chapter ${chapterNumber}`
+      );
     } catch (error) {
       console.error("Failed to load chapter hadiths:", error);
+      setHadiths([]);
+      setTotalPages(1);
     } finally {
       setIsLoading(false);
     }

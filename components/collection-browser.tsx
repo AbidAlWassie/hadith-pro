@@ -12,7 +12,6 @@ import { ArrowLeft, BookOpen, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HadithCard } from "./hadith-card";
 
 interface CollectionBrowserProps {
   collection: HadithCollection;
@@ -50,6 +49,10 @@ export function CollectionBrowser({ collection }: CollectionBrowserProps) {
         collection: collection.id,
       });
       setRecentHadiths(sampleHadiths.slice(0, 6));
+
+      console.log(
+        `[v0] Loaded ${sampleHadiths.length} sample hadiths for collection ${collection.id}`
+      );
     } catch (error) {
       console.error("Failed to load collection data:", error);
     } finally {
@@ -226,7 +229,7 @@ export function CollectionBrowser({ collection }: CollectionBrowserProps) {
       </div>
 
       {/* Recent Hadiths from Collection */}
-      {recentHadiths.length > 0 && (
+      {/* {recentHadiths.length > 0 && (
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-6">
             Recent Hadiths from {collection.name}
@@ -237,7 +240,7 @@ export function CollectionBrowser({ collection }: CollectionBrowserProps) {
             ))}
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

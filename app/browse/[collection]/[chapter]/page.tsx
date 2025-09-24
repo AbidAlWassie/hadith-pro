@@ -4,20 +4,21 @@ import { hadithCollections } from "@/lib/hadith-api";
 import { notFound } from "next/navigation";
 
 interface ChapterPageProps {
-  params: {
+  params: Promise<{
     collection: string;
     chapter: string;
-  };
+  }>;
 }
 
-export default function ChapterPage({ params }: ChapterPageProps) {
-  const collection = hadithCollections.find((c) => c.id === params.collection);
+export default async function ChapterPage({ params }: ChapterPageProps) {
+  const { collection: collectionId, chapter } = await params;
+  const collection = hadithCollections.find((c) => c.id === collectionId);
 
   if (!collection) {
     notFound();
   }
 
-  const chapterNumber = Number.parseInt(params.chapter);
+  const chapterNumber = Number.parseInt(chapter);
   if (isNaN(chapterNumber) || chapterNumber < 1) {
     notFound();
   }

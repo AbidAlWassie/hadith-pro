@@ -477,3 +477,172 @@ export async function getAvailableEditions(): Promise<any> {
     return {};
   }
 }
+
+export async function getHadithsByChapter(
+  collectionId: string,
+  chapterNumber: number,
+  page = 1,
+  limit = 10
+): Promise<{ hadiths: Hadith[]; totalPages: number }> {
+  try {
+    console.log(
+      `[v0] Fetching hadiths for ${collectionId} chapter ${chapterNumber}, page ${page}`
+    );
+
+    // Fetch from multiple sections to get more hadiths
+    const allResults: Hadith[] = [];
+    const sectionsToFetch = Math.min(20, chapterNumber + 10); // Fetch more sections for higher chapters
+
+    for (
+      let sectionNum = chapterNumber;
+      sectionNum <= sectionsToFetch;
+      sectionNum++
+    ) {
+      try {
+        const bothLanguages = await fetchHadithWithBothLanguages(
+          collectionId,
+          sectionNum
+        );
+
+        if (bothLanguages?.english || bothLanguages?.arabic) {
+          const englishData = bothLanguages.english;
+          const arabicData = bothLanguages.arabic;
+
+          const englishHadiths = englishData?.hadiths || [];
+          const arabicHadiths = arabicData?.hadiths || [];
+
+          const maxLength = Math.max(
+            englishHadiths.length,
+            arabicHadiths.length
+          );
+
+          for (let i = 0; i < maxLength; i++) {
+            const englishHadith = englishHadiths[i];
+            const arabicHadith = arabicHadiths[i];
+
+            if (englishHadith || arabicHadith) {
+              const hadithNumber =
+                englishHadith?.hadithnumber ||
+                arabicHadith?.hadithnumber ||
+                sectionNum * 100 + i + 1;
+
+              const hadith: Hadith = {
+                id: `${collectionId}-${hadithNumber}`,
+                text:
+                  englishHadith?.text ||
+                  englishHadith?.hadith ||
+                  "English text not available",
+                textArabic:
+                  arabicHadith?.text ||
+                  arabicHadith?.hadith ||
+                  "النص العربي غير متوفر",
+                narrator:
+                  englishHadith?.narrator ||
+                  arabicHadith?.narrator ||
+                  "Various",
+                collection: collectionId,
+                book: `Book ${
+                  englishHadith?.reference?.book ||
+                  arabicHadith?.reference?.book ||
+                  sectionNum
+                }`,
+                chapter: `Chapter ${chapterNumber}`,
+                hadithNumber: hadithNumber.toString(),
+                grade: getGradeFromHadith(englishHadith || arabicHadith),
+                reference: `${collectionId} ${hadithNumber}`,
+              };
+
+              allResults.push(hadith);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`[v0] Error fetching section ${sectionNum}:`, error);
+      }
+    }
+
+    // If we don't have enough hadiths, try fetching from earlier sections too
+    if (allResults.length < limit && chapterNumber > 1) {
+      for (let sectionNum = 1; sectionNum < chapterNumber; sectionNum++) {
+        try {
+          const bothLanguages = await fetchHadithWithBothLanguages(
+            collectionId,
+            sectionNum
+          );
+
+          if (bothLanguages?.english || bothLanguages?.arabic) {
+            const englishData = bothLanguages.english;
+            const arabicData = bothLanguages.arabic;
+
+            const englishHadiths = englishData?.hadiths || [];
+            const arabicHadiths = arabicData?.hadiths || [];
+
+            const maxLength = Math.max(
+              englishHadiths.length,
+              arabicHadiths.length
+            );
+
+            for (let i = 0; i < maxLength; i++) {
+              const englishHadith = englishHadiths[i];
+              const arabicHadith = arabicHadiths[i];
+
+              if (englishHadith || arabicHadith) {
+                const hadithNumber =
+                  englishHadith?.hadithnumber ||
+                  arabicHadith?.hadithnumber ||
+                  sectionNum * 100 + i + 1;
+
+                const hadith: Hadith = {
+                  id: `${collectionId}-${hadithNumber}`,
+                  text:
+                    englishHadith?.text ||
+                    englishHadith?.hadith ||
+                    "English text not available",
+                  textArabic:
+                    arabicHadith?.text ||
+                    arabicHadith?.hadith ||
+                    "النص العربي غير متوفر",
+                  narrator:
+                    englishHadith?.narrator ||
+                    arabicHadith?.narrator ||
+                    "Various",
+                  collection: collectionId,
+                  book: `Book ${
+                    englishHadith?.reference?.book ||
+                    arabicHadith?.reference?.book ||
+                    sectionNum
+                  }`,
+                  chapter: `Chapter ${chapterNumber}`,
+                  hadithNumber: hadithNumber.toString(),
+                  grade: getGradeFromHadith(englishHadith || arabicHadith),
+                  reference: `${collectionId} ${hadithNumber}`,
+                };
+
+                allResults.push(hadith);
+                if (allResults.length >= 100) break; // Limit total results
+              }
+            }
+          }
+        } catch (error) {
+          console.error(`[v0] Error fetching section ${sectionNum}:`, error);
+        }
+
+        if (allResults.length >= 100) break;
+      }
+    }
+
+    // Paginate results
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedHadiths = allResults.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(allResults.length / limit);
+
+    console.log(
+      `[v0] Returning ${paginatedHadiths.length} hadiths for chapter ${chapterNumber}, page ${page}`
+    );
+    return { hadiths: paginatedHadiths, totalPages };
+  } catch (error) {
+    console.error(`[v0] Error getting hadiths by chapter:`, error);
+    return { hadiths: [], totalPages: 0 };
+  }
+}

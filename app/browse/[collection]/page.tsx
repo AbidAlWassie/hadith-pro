@@ -4,13 +4,14 @@ import { hadithCollections } from "@/lib/hadith-api";
 import { notFound } from "next/navigation";
 
 interface CollectionPageProps {
-  params: {
+  params: Promise<{
     collection: string;
-  };
+  }>;
 }
 
-export default function CollectionPage({ params }: CollectionPageProps) {
-  const collection = hadithCollections.find((c) => c.id === params.collection);
+export default async function CollectionPage({ params }: CollectionPageProps) {
+  const { collection: collectionId } = await params;
+  const collection = hadithCollections.find((c) => c.id === collectionId);
 
   if (!collection) {
     notFound();
